@@ -1,10 +1,12 @@
 import express from "express";
 
-import loaders from "@/loaders/express";
+import expressLoader from "@/loaders/express";
+import loadRedisStore from "@/loaders/redis";
 
 const startApp = () => {
   const app = express();
-  loaders(app);
+  loadRedisStore();
+  expressLoader(app);
   return app;
 };
 
