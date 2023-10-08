@@ -1,10 +1,12 @@
 import { Strategy as LocalStrategy } from "passport-local";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import {
   handleEmailOnSuccessfulAuth,
   verifyEmailToken,
 } from "@/lib/utils/auth";
 
 import logger from "@/configs/logger";
+import configs from "@/configs/vars";
 
 /**
  *
@@ -44,6 +46,27 @@ const configPassport = (passport) => {
 
   const localStrategy = new LocalStrategy(localStrategyOptions, verifyCallback);
   passport.use("local", localStrategy);
+
+  // google strategy
+  const googleCallback = async (accessToken, refreshToken, profile, done) => {
+    const email = profile._json.email;
+
+    const { error, user } = await handleEmailOnSuccessfulAuth(email);
+
+    if (error) return done(error, null);
+
+    return done(null, user);
+  };
+  passport.use(
+    new GoogleStrategy(
+      {
+        clientID: configs.google.clientID,
+        clientSecret: configs.google.clientSecret,
+        callbackURL: configs.google.callbackURL,
+      },
+      googleCallback
+    )
+  );
 
   passport.serializeUser((user, done) => {
     // save user id to passport session

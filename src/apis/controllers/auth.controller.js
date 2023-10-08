@@ -81,6 +81,40 @@ const authController = {
       });
     })(req, res, next);
   },
+
+  // endpoint: /auth/google/callback
+  googleCallback: async (req, res, next) => {
+    passport.authenticate("google", (err, user) => {
+      if (err) {
+        return next(err);
+      }
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          error: {
+            message: "User not found",
+          },
+        });
+      }
+      req.login(user, (err) => {
+        if (err) {
+          return next(err);
+        }
+        req.session.save((err) => {
+          if (err) {
+            return next(err);
+          }
+        });
+        return res.status(200).json({
+          success: true,
+          data: {
+            message: "Login success",
+          },
+        });
+      });
+    })(req, res, next);
+  },
 };
 
 export default authController;
