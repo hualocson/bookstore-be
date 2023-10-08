@@ -1,5 +1,6 @@
 import * as dotenv from "dotenv";
 import osHelpers from "@/lib/helpers.js";
+import ms from "ms";
 
 dotenv.config();
 // Set the NODE_ENV to 'development' by default
@@ -31,4 +32,18 @@ export default {
   redisHost: osHelpers.getOsEnv("REDIS_HOST"),
   redisPort: osHelpers.getOsEnv("REDIS_PORT"),
   redisPassword: osHelpers.getOsEnvOptional("REDIS_PASSWORD"),
+  redisSessionPrefix: osHelpers.getOsEnv("REDIS_SESSION_PREFIX"),
+
+  // session
+  sessionSecret: osHelpers.getOsEnv("SESSION_SECRET"),
+  sessionName: osHelpers.getOsEnv("SESSION_NAME"),
+  sessionMaxAge: ms(osHelpers.getOsEnv("SESSION_MAX_AGE")),
+
+  // nodemailer
+  nodemailer: {
+    host: osHelpers.getOsEnv("MAILTRAP_HOST"),
+    port: osHelpers.getOsEnv("MAILTRAP_PORT"),
+    user: osHelpers.getOsEnv("MAILTRAP_USER"),
+    pass: osHelpers.getOsEnv("MAILTRAP_PASSWORD"),
+  },
 };

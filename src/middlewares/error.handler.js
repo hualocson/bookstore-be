@@ -24,7 +24,7 @@ const errorConverter = (err, req, res, next) => {
   next(error);
 };
 
-const errorHandler = (err, req, res) => {
+const errorHandler = (err, req, res, next) => {
   let { statusCode, message } = err;
   if (configs.isProduction && !err.isOperational) {
     statusCode = httpStatus.INTERNAL_SERVER_ERROR;
