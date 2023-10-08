@@ -1,6 +1,7 @@
 import { body } from "express-validator";
 import authController from "../controllers/auth.controller";
 import { emailValidationChain } from "@/lib/utils/validations";
+import passport from "passport";
 
 const authRoutes = (router) => {
   router.post("/auth/login", emailValidationChain(), authController.login);
@@ -17,6 +18,13 @@ const authRoutes = (router) => {
       .withMessage("Token must be a number"),
     authController.verifyEmail
   );
+
+  router.get(
+    "/auth/google",
+    passport.authenticate("google", { scope: ["profile", "email"] })
+  );
+
+  router.get("/auth/google/callback", authController.googleCallback);
 };
 
 export default authRoutes;

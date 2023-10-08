@@ -46,4 +46,11 @@ export default {
     user: osHelpers.getOsEnv("MAILTRAP_USER"),
     pass: osHelpers.getOsEnv("MAILTRAP_PASSWORD"),
   },
+
+  // google passport
+  google: {
+    clientID: osHelpers.getOsEnv("GOOGLE_CLIENT_ID"),
+    clientSecret: osHelpers.getOsEnv("GOOGLE_CLIENT_SECRET"),
+    callbackURL: osHelpers.getOsEnv("GOOGLE_CALLBACK_URL"),
+  },
 };
