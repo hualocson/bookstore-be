@@ -1,13 +1,13 @@
-import { controllerWrapper } from "@/lib/controller.wrapper";
+import controllerWrapper from "@/lib/controller.wrapper";;
 
 const addressesController = {
     getAddressesById: controllerWrapper(
-        async (_, res, { errorResponse, successResponse, sql }) => {
-        const { customer_id } = req.params;
+        async (req, res, { errorResponse, successResponse, sql }) => {
+        const { id } = req.user;
         const addresses = await sql`
             SELECT street_address, city, state, postal_code, country, phone_number
             FROM addresses
-            WHERE customer_id = ${customer_id} AND deleted_at IS NULL
+            WHERE customer_id = ${id} AND deleted_at IS NULL
         `;
     
         return successResponse(
@@ -21,15 +21,15 @@ const addressesController = {
     createAddresses: controllerWrapper(
         async (req, _, { errorResponse, successResponse, sql }) => {
             const { street_address, city, state, postal_code, country, phone_number } = req.body;
-            const { customer_id } = req.params;
+            const { id } = req.user;
             
             const [newAddress] = await sql`
               INSERT INTO addresses
                 (customer_id, street_address, city, state, postal_code, country, phone_number)
               VALUES
-                (${customer_id}, ${street_address ?? ""}, ${city}, ${
-                    state ?? ""
-                }, ${postal_code ?? ""}, ${country ?? ""}, ${phone_number ?? ""})
+                (${id}, ${street_address}, ${city}, ${
+                    state
+                }, ${postal_code}, ${country}, ${phone_number})
               RETURNING customer_id, street_address, city, postal_code, country, phone_number
             `;
       
@@ -44,29 +44,28 @@ const addressesController = {
     updateAddresses: controllerWrapper(
         async (req, _, { errorResponse, successResponse, sql }) => {
             const { street_address, city, state, postal_code, country, phone_number } = req.body;
-            const {customer_id} = req.params.customer_id;
-            const { id } = req.params.id;
-      
-            // check if category with name existed
+            const { id } = req.user;
+            const { addressId } = req.params;
+        
             const [existingCustomerAddress] = await sql`
-              SELECT customer_id FROM addresses WHERE id = ${id} AND customer_id = ${customer_id}
+              SELECT customer_id FROM addresses WHERE id = ${addressId} AND customer_id = ${id}
             `;
       
             if (!existingCustomerAddress) {
-              return errorResponse("Address does not existed", 400);
+              return errorResponse("Address does not exist", 400);
             }
       
             const [address] = await sql`
               UPDATE addresses
-              SET street_address = ${street_address ?? ""}, city = ${city ?? ""}, state = ${
-                state ?? ""
-              }, postal_code = ${postal_code ?? ""}, country = ${country ?? ""}, phone_number = ${phone_number ?? ""}
-              WHERE id = ${id} AND customer_id = ${customer_id}
+              SET street_address = ${street_address}, city = ${city}, state = ${
+                state
+              }, postal_code = ${postal_code}, country = ${country}, phone_number = ${phone_number}
+              WHERE id = ${addressId} AND customer_id = ${id}
               RETURNING id, customer_id, street_address, city, state, postal_code, country, phone_number
             `;
       
             if (!address) {
-              return errorResponse(`Address with id ${id} not found`, 404);
+              return errorResponse(`Address with id ${addressId} not found`, 404);
             }
       
             return successResponse(
@@ -79,24 +78,24 @@ const addressesController = {
 
     deleteAddress: controllerWrapper(
         async (req, _, { errorResponse, successResponse, sql }) => {
-          const { id } = req.params.id;
-          const { customer_id } = req.params.customer_id;
+          const { id } = req.user;
+          const { addressId } = req.params;
     
           const [existingAdress] = await sql`
-            SELECT id, customer_id, deleted_at FROM addresses WHERE id = ${id} && customer_id = ${customer_id}
+            SELECT deleted_at FROM addresses WHERE id = ${addressId} AND customer_id = ${id}
           `;
     
           if (!existingAdress) {
-            return errorResponse(`Address with id ${id} not found`, 404);
+            return errorResponse(`Address with id ${addressId} not found`, 404);
           }
     
-          if (existingAdress.deleted_at !== null) {
-            return errorResponse(`Address with id ${id} is deleted`, 404);
+          if (existingAdress.deletedAt !== null) {
+            return errorResponse(`Address with id ${addressId} is deleted`, 404);
           }
           const [address] = await sql`
           UPDATE addresses
           SET deleted_at = NOW()
-          WHERE id = ${id} AND customer_id = ${customer_id}
+          WHERE id = ${addressId} AND customer_id = ${id}
           RETURNING id, customer_id, street_address, city, state, postal_code, country, phone_number
           `;
 
