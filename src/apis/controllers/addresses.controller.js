@@ -1,4 +1,4 @@
-import controllerWrapper from "@/lib/controller.wrapper";;
+import controllerWrapper from "@/lib/controller.wrapper";
 
 const addressesController = {
     getAddressesById: controllerWrapper(
