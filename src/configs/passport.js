@@ -37,7 +37,10 @@ const configPassport = (passport) => {
 
         if (error) done(error, false);
         else done(null, user);
-      } else done("Invalid token", false);
+      } else {
+        logger.error("Invalid token");
+        done(new Error("Invalid token"));
+      }
     } catch (error) {
       logger.error("Verify Callback error: ", error);
       return done(error);

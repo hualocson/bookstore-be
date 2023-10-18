@@ -3,9 +3,9 @@ import express from "express";
 import expressLoader from "@/loaders/express";
 import loadRedisStore from "@/loaders/redis";
 
-const startApp = () => {
+const startApp = async () => {
   const app = express();
-  loadRedisStore();
+  await loadRedisStore();
   expressLoader(app);
   return app;
 };

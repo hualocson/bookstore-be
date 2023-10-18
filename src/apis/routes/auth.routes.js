@@ -25,6 +25,8 @@ const authRoutes = (router) => {
   );
 
   router.get("/auth/google/callback", authController.googleCallback);
+
+  router.post("/auth/logout", authController.logout);
 };
 
 export default authRoutes;
