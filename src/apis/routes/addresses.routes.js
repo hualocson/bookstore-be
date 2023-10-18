@@ -11,11 +11,11 @@ const addressesRoutes = (router) => {
     router.post(
         "/addresses",
         isAuth,
-        body("street_address")
+        body("streetAddress")
           .notEmpty()
-          .withMessage("street_address is required")
+          .withMessage("streetAddress is required")
           .isString()
-          .withMessage("street_address must be a string"),
+          .withMessage("streetAddress must be a string"),
         body("city")
           .notEmpty()
           .withMessage("city is required")
@@ -26,21 +26,21 @@ const addressesRoutes = (router) => {
           .withMessage("state is required")
           .isString()
           .withMessage("state must be a string"),
-        body("postal_code")
+        body("postalCode")
           .notEmpty()
-          .withMessage("postal_code is required")
+          .withMessage("postalCode is required")
           .isString()
-          .withMessage("postal_code must be a string"),
+          .withMessage("postalCode must be a string"),
         body("country")
           .notEmpty()
           .withMessage("country is required")
           .isString()
           .withMessage("country must be a string"),
-        body("phone_number")
+        body("phoneNumber")
           .notEmpty()
-          .withMessage("phone_number is required")
+          .withMessage("phoneNumber is required")
           .isString()
-          .withMessage("phone_number must be a string"),
+          .withMessage("phoneNumber must be a string"),
         addressesController.createAddresses
       );
 
@@ -48,11 +48,11 @@ const addressesRoutes = (router) => {
         "/addresses/:addressId",
         isAuth,
         param("addressId").isInt().withMessage("Id must be a number"),
-        body("street_address")
+        body("streetAddress")
           .notEmpty()
-          .withMessage("street_address is required")
+          .withMessage("streetAddress is required")
           .isString()
-          .withMessage("street_address must be a string"),
+          .withMessage("streetAddress must be a string"),
         body("city")
           .notEmpty()
           .withMessage("city is required")
@@ -63,21 +63,21 @@ const addressesRoutes = (router) => {
           .withMessage("state is required")
           .isString()
           .withMessage("state must be a string"),
-        body("postal_code")
+        body("postalCode")
           .notEmpty()
-          .withMessage("postal_code is required")
+          .withMessage("postalCode is required")
           .isString()
-          .withMessage("postal_code must be a string"),
+          .withMessage("postalCode must be a string"),
         body("country")
           .notEmpty()
           .withMessage("country is required")
           .isString()
           .withMessage("country must be a string"),
-        body("phone_number")
+        body("phoneNumber")
           .notEmpty()
-          .withMessage("phone_number is required")
+          .withMessage("phoneNumber is required")
           .isString()
-          .withMessage("phone_number must be a string"),
+          .withMessage("phoneNumber must be a string"),
         addressesController.updateAddresses
     );
 
