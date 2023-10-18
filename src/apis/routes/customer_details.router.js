@@ -11,42 +11,42 @@ const customerDetailRoutes = (router) => {
     router.post(
         "/detail",
         isAuth,
-        body("first_name")
+        body("firstName")
           .notEmpty()
-          .withMessage("first_name is required")
+          .withMessage("firstName is required")
           .isString()
-          .withMessage("first_name must be a string"),
-        body("last_name")
+          .withMessage("firstName must be a string"),
+        body("lastName")
           .notEmpty()
-          .withMessage("last_name is required")
+          .withMessage("lastName is required")
           .isString()
-          .withMessage("last_name must be a string"),
-        body("phone_number")
+          .withMessage("lastName must be a string"),
+        body("phoneNumber")
           .notEmpty()
-          .withMessage("phone_number is required")
+          .withMessage("phoneNumber is required")
           .isString()
-          .withMessage("phone_number must be a string"),
+          .withMessage("phoneNumber must be a string"),
         customerDetailsController.createCustomerDetail
       );
 
     router.patch(
         "/detail",
         isAuth,
-        body("first_name")
+        body("firstName")
           .notEmpty()
-          .withMessage("first_name is required")
+          .withMessage("firstName is required")
           .isString()
-          .withMessage("first_name must be a string"),
-        body("last_name")
+          .withMessage("firstName must be a string"),
+        body("lastName")
           .notEmpty()
-          .withMessage("last_name is required")
+          .withMessage("lastName is required")
           .isString()
-          .withMessage("last_name must be a string"),
-        body("phone_number")
+          .withMessage("lastName must be a string"),
+        body("phoneNumber")
           .notEmpty()
-          .withMessage("phone_number is required")
+          .withMessage("phoneNumber is required")
           .isString()
-          .withMessage("phone_number must be a string"),
+          .withMessage("phoneNumber must be a string"),
         customerDetailsController.updateCustomerDetail
     );
 };

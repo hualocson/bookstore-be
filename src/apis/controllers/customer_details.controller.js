@@ -20,7 +20,7 @@ const customerDetailsController = {
 
     createCustomerDetail: controllerWrapper(
         async (req, _, { errorResponse, successResponse, sql }) => {
-            const { first_name, last_name, phone_number } = req.body;
+            const { firstName, lastName, phoneNumber } = req.body;
             const { id } = req.user;
 
             const [existingCustomerDetail] = await sql`
@@ -35,7 +35,7 @@ const customerDetailsController = {
               INSERT INTO customer_details
                 (id, first_name, last_name, phone_number)
               VALUES
-                (${id}, ${first_name}, ${last_name}, ${phone_number})
+                (${id}, ${firstName}, ${lastName}, ${phoneNumber})
               RETURNING id, first_name, last_name, phone_number
             `;
       
@@ -49,7 +49,7 @@ const customerDetailsController = {
 
     updateCustomerDetail: controllerWrapper(
         async (req, _, { errorResponse, successResponse, sql }) => {
-            const { first_name, last_name, phone_number } = req.body;
+            const { firstName, lastName, phoneNumber } = req.body;
             const { id } = req.user;
         
             const [existingCustomerDetail] = await sql`
@@ -62,7 +62,7 @@ const customerDetailsController = {
       
             const [detail] = await sql`
               UPDATE customer_details
-              SET first_name = ${first_name}, last_name = ${last_name}, phone_number = ${phone_number}
+              SET first_name = ${firstName}, last_name = ${lastName}, phone_number = ${phoneNumber}
               WHERE id = ${id}
               RETURNING id, first_name, last_name, phone_number
             `;
