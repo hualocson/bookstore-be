@@ -1,5 +1,6 @@
 import controllerWrapper from "@/lib/controller.wrapper";
 import { sendTokenEmail } from "@/lib/utils/auth";
+import { userServices } from "@/redis-om/user";
 import { validationResult } from "express-validator";
 import passport from "passport";
 
@@ -114,6 +115,43 @@ const authController = {
         });
       });
     })(req, res, next);
+  },
+
+  logout: async (req, res, next) => {
+    // check user is already logged out
+    if (!req.user) {
+      return res.status(400).json({
+        success: false,
+        error: {
+          message: "User is not logged in",
+        },
+      });
+    }
+
+    const { id } = req.user;
+
+    req.logout(async (err) => {
+      if (err) {
+        return next(err);
+      }
+    });
+
+    const isSuccess = await userServices.removeUser(id);
+    if (!isSuccess) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          message: "Remove user object form redis failed",
+        },
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        message: "Logout success",
+      },
+    });
   },
 };
 
