@@ -3,21 +3,25 @@ import sql from "@/configs/db";
 import redisClient from "@/configs/redis";
 import { CustomerStatus } from "@/lib/constants";
 import sendEmail from "./email-sender";
+import { saveUser } from "@/redis-om/user/user.services";
 
 const handleEmailOnSuccessfulAuth = async (email) => {
   try {
     const [user] =
-      await sql`SELECT id, email FROM customers WHERE email = ${email}`;
+      await sql`SELECT id, email, status FROM customers WHERE email = ${email}`;
 
     if (!user) {
       const [newUser] =
         await sql`INSERT INTO customers (email, status) VALUES (${email}, ${CustomerStatus.PENDING}) RETURNING id, email, status`;
+
+      await saveUser({ ...newUser });
       return {
         error: null,
         user: newUser,
       };
     }
 
+    await saveUser({ ...user });
     return {
       error: null,
       user,
