@@ -1,7 +1,8 @@
 import redisClient from "@/configs/redis";
 import logger from "@/configs/logger";
+import { createIndex } from "@/redis-om/libs";
 
-const loadRedisStore = () => {
+const loadRedisStore = async () => {
   redisClient.on("error", (err) => {
     logger.error(`Redis error: ${err}`);
   });
@@ -14,6 +15,8 @@ const loadRedisStore = () => {
     .catch((err) => {
       logger.error(`Redis connect error: ${err}`);
     });
+
+  await createIndex();
 };
 
 export default loadRedisStore;
