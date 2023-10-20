@@ -1,6 +1,6 @@
 import { body, param } from "express-validator";
 import cartController from "../controllers/cart.controller";
-import isAuth from "../middlwares/isAuth";
+import isAuth from "../middlewares/isAuth";
 
 const cartRoutes = (router) => {
   router.get("/carts", isAuth, cartController.getAllCartItem);
