@@ -4,7 +4,7 @@ import addressesRoutes from "./routes/addresses.routes";
 import customerDetailRoutes from "./routes/customer_details.routes";
 import cartRoutes from "./routes/cart.routes";
 import ordersRoutes from "./routes/orders.routes";
-
+import couponsRoutes from "./routes/coupons.routes";
 export default () => {
   const router = Router();
 
@@ -13,5 +13,6 @@ export default () => {
   customerDetailRoutes(router);
   cartRoutes(router);
   ordersRoutes(router);
+  couponsRoutes(router);
   return router;
 };

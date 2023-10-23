@@ -11,4 +11,12 @@ const OrderStatus = {
   CANCELED: 1304,
 };
 
-export { CustomerStatus, OrderStatus };
+const CouponStatus =
+{
+  ACTIVE	:1203,
+  EXPIRED	:204,
+  DISABLED	:1205
+}
+
+
+export { CustomerStatus, OrderStatus, CouponStatus };
