@@ -4,4 +4,11 @@ const CustomerStatus = {
   INACTIVE: 1403,
 };
 
-export { CustomerStatus };
+const OrderStatus = {
+  PENDING: 1301,
+  PROCESSED: 1302,
+  DELIVERED: 1303,
+  CANCELED: 1304,
+};
+
+export { CustomerStatus, OrderStatus };

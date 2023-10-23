@@ -52,19 +52,25 @@ const saveCart = async ({
 /**
  * @description search cart by userId return a list of cart item
  * @param {number} userId
- * @returns {Promise<import('./type.d.ts').CartItem[]?>}
+ * @param {import('./type.d.ts').SearchOptions} [options={}]
+ * @returns {Promise<import('./type.d.ts').CartItem[]>}
  */
-const searchCart = async (userId) => {
+const searchCart = async (userId, options = {}) => {
   try {
     const foundCart = await cartItemRepository
       .search()
       .where("userId")
-      .equals(parseInt(userId))
+      .equals(userId)
       .return.all();
+
+    if (options.checked) {
+      return foundCart.filter((cartItem) => cartItem.checked);
+    }
 
     return foundCart;
   } catch (error) {
     console.log("[Error] searchCart ->", error);
+    return [];
   }
 };
 
@@ -140,10 +146,30 @@ const toggleCheckedCartItem = async (userId, productId) => {
   }
 };
 
+const clearCart = async (userId) => {
+  try {
+    const foundCart = await searchCart(userId, { checked: true });
+
+    if (!foundCart.length) {
+      return false;
+    }
+
+    // remove cart items array from redis
+    const cartItemIds = foundCart.map((cartItem) => cartItem[EntityId]);
+    await cartItemRepository.remove(cartItemIds);
+
+    return true;
+  } catch (error) {
+    console.log("[Error] clearCart ->", error);
+    return false;
+  }
+};
+
 export {
   saveCart,
   searchCart,
   searchCartItem,
   updateQuantityCartItem,
   toggleCheckedCartItem,
+  clearCart,
 };
