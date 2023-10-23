@@ -89,4 +89,4 @@ const addressesRoutes = (router) => {
     );
 };
   
-  export default addressesRoutes;
+export default addressesRoutes;
