@@ -14,7 +14,7 @@ const OrderStatus = {
 const CouponStatus =
 {
   ACTIVE	:1203,
-  EXPIRED	:204,
+  EXPIRED	:1204,
   DISABLED	:1205
 }
 
