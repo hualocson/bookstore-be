@@ -1,3 +1,4 @@
+import { CustomerStatus } from "@/lib/constants";
 import controllerWrapper from "@/lib/controller.wrapper";
 
 const customerDetailsController = {
@@ -31,18 +32,28 @@ const customerDetailsController = {
         return errorResponse("Details is exited", 400);
       }
 
-      const [newDetail] = await sql`
-              INSERT INTO customer_details
-                (id, first_name, last_name, phone_number)
-              VALUES
-                (${id}, ${firstName}, ${lastName}, ${phoneNumber})
-              RETURNING id, first_name, last_name, phone_number
-            `;
+      const [newDetail, updateCustomer] = await sql.begin(async (sql) => {
+        const [newDetail] = await sql`
+                INSERT INTO customer_details
+                  (id, first_name, last_name, phone_number)
+                VALUES
+                  (${id}, ${firstName}, ${lastName}, ${phoneNumber})
+                RETURNING id, first_name, last_name, phone_number
+              `;
+
+        const [updateCustomer] = await sql`
+                UPDATE customers
+                SET status = ${CustomerStatus.ACTIVE}
+                WHERE id = ${id}
+                RETURNING id, email, status
+              `;
+        return [newDetail, updateCustomer];
+      });
 
       return successResponse(
         { newDetail },
         "Create new customer details successfully",
-        201
+        200
       );
     }
   ),
