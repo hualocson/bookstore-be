@@ -13,3 +13,7 @@ export declare type CartItem = Entity & {
   price: number;
   checked: boolean;
 };
+
+export declare type SearchOptions = {
+  checked?: boolean;
+};
