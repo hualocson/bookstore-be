@@ -1,7 +1,7 @@
-import { body } from "express-validator";
-import authController from "../controllers/auth.controller";
 import { emailValidationChain } from "@/lib/utils/validations";
+import { body } from "express-validator";
 import passport from "passport";
+import authController from "../controllers/auth.controller";
 
 const authRoutes = (router) => {
   router.post("/auth/login", emailValidationChain(), authController.login);
@@ -26,7 +26,7 @@ const authRoutes = (router) => {
 
   router.get("/auth/google/callback", authController.googleCallback);
 
-  router.post("/auth/logout", authController.logout);
+  router.get("/auth/logout", authController.logout);
 };
 
 export default authRoutes;
