@@ -1,10 +1,14 @@
+import categoriesRoutes from "@/apis/routes/categories.routes";
+import customerRoutes from "@/apis/routes/customers.routes";
+import productsRoutes from "@/apis/routes/products.routes";
 import { Router } from "express";
-import authRoutes from "./routes/auth.routes";
 import addressesRoutes from "./routes/addresses.routes";
-import customerDetailRoutes from "./routes/customer_details.routes";
+import authRoutes from "./routes/auth.routes";
 import cartRoutes from "./routes/cart.routes";
-import ordersRoutes from "./routes/orders.routes";
 import couponsRoutes from "./routes/coupons.routes";
+import customerDetailRoutes from "./routes/customer_details.routes";
+import ordersRoutes from "./routes/orders.routes";
+
 export default () => {
   const router = Router();
 
@@ -14,5 +18,8 @@ export default () => {
   cartRoutes(router);
   ordersRoutes(router);
   couponsRoutes(router);
+  productsRoutes(router);
+  categoriesRoutes(router);
+  customerRoutes(router);
   return router;
 };
