@@ -4,6 +4,7 @@ import isAuth from "../middlewares/isAuth";
 
 const cartRoutes = (router) => {
   router.get("/carts", isAuth, cartController.getAllCartItem);
+  router.get("/carts/length", isAuth, cartController.getCartLength);
 
   router.post(
     "/carts",

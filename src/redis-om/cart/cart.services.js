@@ -29,7 +29,7 @@ const saveCart = async ({
       savedCart = await cartItemRepository.save(entityId, {
         userId,
         productId,
-        quantity,
+        quantity: foundCartItem.quantity + quantity,
         price,
         checked,
       });
@@ -166,10 +166,10 @@ const clearCart = async (userId) => {
 };
 
 export {
+  clearCart,
   saveCart,
   searchCart,
   searchCartItem,
-  updateQuantityCartItem,
   toggleCheckedCartItem,
-  clearCart,
+  updateQuantityCartItem,
 };

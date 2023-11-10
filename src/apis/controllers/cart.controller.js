@@ -77,6 +77,17 @@ const cartController = {
 
     return successResponse({ cartItems }, "Cart items retrieved");
   }),
+
+  getCartLength: controllerWrapper(async (req, res, { successResponse }) => {
+    const { id } = req.user;
+
+    const cartItems = await cartItemServices.searchCart(id);
+
+    return successResponse(
+      { length: cartItems.length },
+      "Cart items retrieved"
+    );
+  }),
 };
 
 export default cartController;
