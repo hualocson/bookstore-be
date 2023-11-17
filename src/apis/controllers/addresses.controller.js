@@ -1,13 +1,14 @@
 import controllerWrapper from "@/lib/controller.wrapper";
 
 const addressesController = {
-  getAddressesById: controllerWrapper(
+  getAddresses: controllerWrapper(
     async (req, res, { errorResponse, successResponse, sql }) => {
       const { id } = req.user;
       const addresses = await sql`
-            SELECT street_address, city, state, postal_code, country, phone_number
+            SELECT id, name, street_address, city, state, postal_code, country, phone_number
             FROM addresses
             WHERE customer_id = ${id} AND deleted_at IS NULL
+            ORDER BY created_at DESC
         `;
 
       return successResponse(
@@ -20,15 +21,22 @@ const addressesController = {
 
   createAddresses: controllerWrapper(
     async (req, _, { errorResponse, successResponse, sql }) => {
-      const { streetAddress, city, state, postalCode, country, phoneNumber } =
-        req.body;
+      const {
+        name,
+        streetAddress,
+        city,
+        state,
+        postalCode,
+        country,
+        phoneNumber,
+      } = req.body;
       const { id } = req.user;
 
       const [newAddress] = await sql`
               INSERT INTO addresses
-                (customer_id, street_address, city, state, postal_code, country, phone_number)
+                (customer_id, name, street_address, city, state, postal_code, country, phone_number)
               VALUES
-                (${id}, ${streetAddress}, ${city}, ${state}, ${postalCode}, ${country}, ${phoneNumber})
+                (${id}, ${name}, ${streetAddress}, ${city}, ${state}, ${postalCode}, ${country}, ${phoneNumber})
               RETURNING customer_id, street_address, city, postal_code, country, phone_number
             `;
 
@@ -42,8 +50,15 @@ const addressesController = {
 
   updateAddresses: controllerWrapper(
     async (req, _, { errorResponse, successResponse, sql }) => {
-      const { streetAddress, city, state, postalCode, country, phoneNumber } =
-        req.body;
+      const {
+        name,
+        streetAddress,
+        city,
+        state,
+        postalCode,
+        country,
+        phoneNumber,
+      } = req.body;
       const { id } = req.user;
       const { addressId } = req.params;
 
@@ -57,7 +72,7 @@ const addressesController = {
 
       const [address] = await sql`
               UPDATE addresses
-              SET street_address = ${streetAddress}, city = ${city}, state = ${state}, postal_code = ${postalCode}, country = ${country}, phone_number = ${phoneNumber}
+              SET name = ${name}, street_address = ${streetAddress}, city = ${city}, state = ${state}, postal_code = ${postalCode}, country = ${country}, phone_number = ${phoneNumber}
               WHERE id = ${addressId} AND customer_id = ${id}
               RETURNING id, customer_id, street_address, city, state, postal_code, country, phone_number
             `;

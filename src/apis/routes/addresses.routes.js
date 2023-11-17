@@ -3,11 +3,16 @@ import addressesController from "../controllers/addresses.controller";
 import isAuth from "../middlewares/isAuth";
 
 const addressesRoutes = (router) => {
-  router.get("/addresses", isAuth, addressesController.getAddressesById);
+  router.get("/addresses", isAuth, addressesController.getAddresses);
 
   router.post(
     "/addresses",
     isAuth,
+    body("name")
+      .notEmpty()
+      .withMessage("name is required")
+      .isString()
+      .withMessage("name must be a string"),
     body("streetAddress")
       .notEmpty()
       .withMessage("streetAddress is required")
@@ -45,6 +50,11 @@ const addressesRoutes = (router) => {
     "/addresses/:addressId",
     isAuth,
     param("addressId").isInt().withMessage("Id must be a number"),
+    body("name")
+      .notEmpty()
+      .withMessage("name is required")
+      .isString()
+      .withMessage("name must be a string"),
     body("streetAddress")
       .notEmpty()
       .withMessage("streetAddress is required")

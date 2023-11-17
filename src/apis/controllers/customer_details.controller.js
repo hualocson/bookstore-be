@@ -32,7 +32,7 @@ const customerDetailsController = {
         return errorResponse("Details is exited", 400);
       }
 
-      const [newDetail, updateCustomer] = await sql.begin(async (sql) => {
+      const [newDetail] = await sql.begin(async (sql) => {
         const [newDetail] = await sql`
                 INSERT INTO customer_details
                   (id, first_name, last_name, phone_number)
