@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import { EntityId } from "redis-om";
 import cartItemRepository from "./cart.repository";
 
@@ -24,6 +25,9 @@ const saveCart = async ({
 
     let savedCart;
 
+    // get time now unix use dayjs library
+    const createdAt = dayjs().unix();
+
     if (foundCartItem) {
       const entityId = foundCartItem[EntityId];
       savedCart = await cartItemRepository.save(entityId, {
@@ -32,6 +36,7 @@ const saveCart = async ({
         quantity: foundCartItem.quantity + quantity,
         price,
         checked,
+        createdAt: foundCartItem.createdAt,
       });
     } else {
       savedCart = await cartItemRepository.save({
@@ -40,6 +45,7 @@ const saveCart = async ({
         quantity,
         price,
         checked,
+        createdAt: createdAt / 1000,
       });
     }
 
@@ -61,6 +67,7 @@ const searchCart = async (userId, options = {}) => {
       .search()
       .where("userId")
       .equals(userId)
+      .sortAsc("createdAt")
       .return.all();
 
     if (options.checked) {
@@ -165,8 +172,26 @@ const clearCart = async (userId) => {
   }
 };
 
+const removeCartItem = async (userId, productId) => {
+  try {
+    const foundCartItem = await searchCartItem(userId, productId);
+
+    if (!foundCartItem) {
+      return false;
+    }
+
+    await cartItemRepository.remove(foundCartItem[EntityId]);
+
+    return true;
+  } catch (error) {
+    console.log("[Error] removeCartItem ->", error);
+    return false;
+  }
+};
+
 export {
   clearCart,
+  removeCartItem,
   saveCart,
   searchCart,
   searchCartItem,

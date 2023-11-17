@@ -1,5 +1,5 @@
-import { Schema, Repository } from "redis-om";
 import redisClient from "@/configs/redis";
+import { Repository, Schema } from "redis-om";
 
 const cartItemSchema = new Schema("cartItem", {
   userId: { type: "number" },
@@ -7,6 +7,7 @@ const cartItemSchema = new Schema("cartItem", {
   quantity: { type: "number" },
   price: { type: "number" },
   checked: { type: "boolean" },
+  createdAt: { type: "date", sortable: true },
 });
 
 const cartItemRepository = new Repository(cartItemSchema, redisClient);
