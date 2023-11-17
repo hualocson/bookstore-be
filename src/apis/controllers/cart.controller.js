@@ -63,20 +63,35 @@ const cartController = {
       );
 
       if (!cartItem) {
-        return errorResponse("Item not in cart.", 400);
+        return errorResponse("Item not in cart.", 404);
       }
 
       return successResponse({ cartItem }, "Cart item updated");
     }
   ),
 
-  getAllCartItem: controllerWrapper(async (req, res, { successResponse }) => {
-    const { id } = req.user;
+  getAllCartItem: controllerWrapper(
+    async (req, res, { sql, successResponse }) => {
+      const { id } = req.user;
 
-    const cartItems = await cartItemServices.searchCart(id);
+      const cartItems = await cartItemServices.searchCart(id);
+      const itemDetails = await sql`
+        SELECT id, name, image FROM products WHERE id IN ${sql(
+          cartItems.map((item) => item.productId)
+        )}
+      `;
 
-    return successResponse({ cartItems }, "Cart items retrieved");
-  }),
+      cartItems.forEach((item) => {
+        const itemDetail = itemDetails.find(
+          (detail) => detail.id === item.productId
+        );
+        item.name = itemDetail.name;
+        item.image = itemDetail.image;
+      });
+
+      return successResponse({ cartItems }, "Cart items retrieved");
+    }
+  ),
 
   getCartLength: controllerWrapper(async (req, res, { successResponse }) => {
     const { id } = req.user;
@@ -88,6 +103,20 @@ const cartController = {
       "Cart items retrieved"
     );
   }),
+  removeCartItem: controllerWrapper(
+    async (req, res, { successResponse, errorResponse }) => {
+      const { id } = req.user;
+      const { productId } = req.params;
+
+      const isSuccess = await cartItemServices.removeCartItem(id, productId);
+
+      if (!isSuccess) {
+        return errorResponse("Item not in cart.", 404);
+      }
+
+      return successResponse({}, "Cart item removed");
+    }
+  ),
 };
 
 export default cartController;

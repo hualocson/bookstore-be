@@ -2,6 +2,10 @@ import { body, param } from "express-validator";
 import cartController from "../controllers/cart.controller";
 import isAuth from "../middlewares/isAuth";
 
+/**
+ *
+ * @param {import('express').Router} router
+ */
 const cartRoutes = (router) => {
   router.get("/carts", isAuth, cartController.getAllCartItem);
   router.get("/carts/length", isAuth, cartController.getCartLength);
@@ -39,6 +43,15 @@ const cartRoutes = (router) => {
       .isInt({ min: 1 })
       .withMessage("Product id must be a positive integer"),
     cartController.toggleCheckedCartItem
+  );
+
+  router.delete(
+    "/carts/:productId",
+    isAuth,
+    param("productId")
+      .isInt({ min: 1 })
+      .withMessage("Product id must be a positive integer"),
+    cartController.removeCartItem
   );
 };
 
