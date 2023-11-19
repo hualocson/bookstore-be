@@ -23,10 +23,9 @@ const ordersController = {
           shippingFee,
           status: OrderStatus.PENDING,
           couponId: couponId || null,
-          total: cartItems.reduce(
-            (acc, cur) => acc + cur.quantity * cur.price,
-            0
-          ),
+          total:
+            cartItems.reduce((acc, cur) => acc + cur.quantity * cur.price, 0) +
+            parseInt(shippingFee, 10),
         })} RETURNING id`;
 
         const newOrderItems = await sql`INSERT INTO order_items ${sql(
@@ -40,9 +39,9 @@ const ordersController = {
         RETURNING id, order_id, product_id, quantity, price
         `;
 
-        // update quantity of product
+        // update quantity of product and sold of product
         await sql`
-        UPDATE products SET quantity = products.quantity - CAST(update_data.quantity AS int)
+        UPDATE products SET quantity = products.quantity - CAST(update_data.quantity AS int), sold = products.sold + CAST(update_data.quantity AS int)
         FROM (VALUES ${sql(
           newOrderItems.map((item) => [item.productId, item.quantity])
         )}) AS update_data (productId, quantity)
