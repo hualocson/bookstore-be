@@ -62,6 +62,44 @@ const ordersController = {
       return successResponse({ newOrder, newOrderItems }, "Order created", 201);
     }
   ),
+
+  getOrders: controllerWrapper(async (req, res, { successResponse, sql }) => {
+    const { id } = req.user;
+
+    const orders = await sql`
+        SELECT orders.id, orders.status, orders.total, orders.created_at
+        FROM orders
+        WHERE orders.customer_id = ${id}
+        ORDER BY orders.created_at DESC
+      `;
+
+    // query order items
+    const orderIds = orders.map((order) => order.id);
+    const orderItems = await sql`
+        SELECT order_items.id, order_items.product_id, order_items.order_id, p.name, p.image, p.slug, pd.author, order_items.quantity, order_items.price, o.canceled_at, o.completed_at, o.delivery_at
+        FROM order_items
+        LEFT JOIN orders o ON order_items.order_id = o.id
+        LEFT JOIN products p ON order_items.product_id = p.id
+        LEFT JOIN product_details pd ON p.id = pd.id
+        WHERE order_items.order_id IN ${sql(orderIds)}
+      `;
+
+    // group order items by order id
+    const orderItemsMap = orderItems.reduce((acc, cur) => {
+      const { orderId, ...rest } = cur;
+      if (!acc[orderId]) {
+        acc[orderId] = [];
+      }
+      acc[orderId].push(rest);
+      return acc;
+    }, {});
+
+    return successResponse(
+      { orders, orderItems: orderItemsMap },
+      "Get all orders",
+      200
+    );
+  }),
 };
 
 export default ordersController;

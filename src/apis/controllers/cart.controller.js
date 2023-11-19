@@ -76,9 +76,9 @@ const cartController = {
 
       const cartItems = await cartItemServices.searchCart(id);
       const itemDetails = await sql`
-        SELECT id, name, image FROM products WHERE id IN ${sql(
-          cartItems.map((item) => item.productId)
-        )}
+        SELECT p.id, p.name, p.image, pd.author FROM products p
+        LEFT JOIN product_details pd ON pd.id = p.id
+        WHERE p.id IN ${sql(cartItems.map((item) => item.productId))}
       `;
 
       cartItems.forEach((item) => {
@@ -86,6 +86,7 @@ const cartController = {
           (detail) => detail.id === item.productId
         );
         item.name = itemDetail.name;
+        item.author = itemDetail.author;
         item.image = itemDetail.image;
       });
 
