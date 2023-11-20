@@ -21,6 +21,7 @@ const cartRoutes = (router) => {
     body("quantity")
       .isInt({ min: 1 })
       .withMessage("Quantity must be a positive integer"),
+    body("checked").isBoolean().withMessage("Checked must be a boolean"),
     cartController.addToCart
   );
 
@@ -43,6 +44,13 @@ const cartRoutes = (router) => {
       .isInt({ min: 1 })
       .withMessage("Product id must be a positive integer"),
     cartController.toggleCheckedCartItem
+  );
+
+  router.patch(
+    "/carts/toggle-all",
+    isAuth,
+    body("checked").isBoolean().withMessage("Checked must be a boolean"),
+    cartController.toggleAllCartItems
   );
 
   router.delete(

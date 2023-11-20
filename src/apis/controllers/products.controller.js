@@ -3,6 +3,8 @@ import controllerWrapper from "@/lib/controller.wrapper";
 const productsController = {
   getProducts: controllerWrapper(
     async (req, res, { successResponse, errorResponse, sql }) => {
+      const { search } = req.query;
+
       const products = await sql`
       SELECT
         p.id,
@@ -23,7 +25,11 @@ const productsController = {
       LEFT JOIN categories c ON
         p.category_id = c.id
       WHERE
-        p.deleted_at IS NULL
+        p.deleted_at IS NULL ${
+          search && search !== ""
+            ? sql`AND p.name ILIKE ${`%${search}%`}`
+            : sql``
+        }
       ORDER BY p.created_at
       `;
 
@@ -41,6 +47,7 @@ const productsController = {
         category_id,
         p.name,
         p.slug,
+        c.slug AS category_slug,
         p.description,
         p.image,
         p.price,
@@ -67,6 +74,37 @@ const productsController = {
       }
 
       return successResponse({ product }, "Product retrieved successfully");
+    }
+  ),
+
+  getProductByCategory: controllerWrapper(
+    async (req, res, { successResponse, errorResponse, sql }) => {
+      const { slug } = req.params;
+
+      const products = await sql`
+    SELECT
+      p.id,
+      category_id,
+      p.name,
+      p.slug,
+      p.description,
+      p.image,
+      p.price,
+      p.quantity,
+      p.status,
+      p.deleted_at,
+      c.name AS category_name,
+      pd.author
+    FROM
+      products p
+    LEFT JOIN product_details pd ON p.id = pd.id
+    LEFT JOIN categories c ON
+      p.category_id = c.id
+    WHERE
+      p.deleted_at IS NULL AND c.slug = ${slug}
+    ORDER BY p.created_at
+    `;
+      return successResponse({ products }, "Products retrieved successfully");
     }
   ),
 };

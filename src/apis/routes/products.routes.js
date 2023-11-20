@@ -7,6 +7,10 @@ import productsController from "@/apis/controllers/products.controller";
 const productsRoutes = (router) => {
   router.get("/products/:slug", productsController.getProductDetails);
   router.get("/products", productsController.getProducts);
+  router.get(
+    "/products/categories/:slug",
+    productsController.getProductByCategory
+  );
 };
 
 export default productsRoutes;

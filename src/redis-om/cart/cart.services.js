@@ -67,7 +67,7 @@ const searchCart = async (userId, options = {}) => {
       .search()
       .where("userId")
       .equals(userId)
-      .sortAsc("createdAt")
+      .sortDesc("createdAt")
       .return.all();
 
     if (options.checked) {
@@ -153,6 +153,25 @@ const toggleCheckedCartItem = async (userId, productId) => {
   }
 };
 
+const toggleAllCartItems = async (userId, checked) => {
+  try {
+    const foundCart = await searchCart(userId, { checked: !checked });
+
+    if (!foundCart.length) {
+      return false;
+    }
+
+    const cartItemIds = foundCart.map((cartItem) => cartItem[EntityId]);
+
+    await cartItemRepository.update(cartItemIds, { checked: checked });
+
+    return true;
+  } catch (error) {
+    console.log("[Error] unCheckAllCartItems ->", error);
+    return false;
+  }
+};
+
 const clearCart = async (userId) => {
   try {
     const foundCart = await searchCart(userId, { checked: true });
@@ -195,6 +214,7 @@ export {
   saveCart,
   searchCart,
   searchCartItem,
+  toggleAllCartItems,
   toggleCheckedCartItem,
   updateQuantityCartItem,
 };
