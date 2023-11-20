@@ -28,7 +28,7 @@ const authController = {
       const [user] = await sql`SELECT id FROM customers WHERE email = ${email}`;
 
       if (user) {
-        return errorResponse("User already exists", 400);
+        return errorResponse("User already exists. Please login!", 400);
       }
 
       // send token

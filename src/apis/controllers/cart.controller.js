@@ -6,7 +6,7 @@ const cartController = {
   addToCart: controllerWrapper(
     async (req, res, { successResponse, errorResponse, sql }) => {
       const { id } = req.user;
-      const { productId, quantity } = req.body;
+      const { productId, quantity, checked } = req.body;
 
       // get product price
       const [product] = await sql`
@@ -20,7 +20,7 @@ const cartController = {
         userId: id,
         productId,
         quantity,
-        checked: true,
+        checked: checked ?? false,
         price: product.price,
       });
 
@@ -67,6 +67,17 @@ const cartController = {
       }
 
       return successResponse({ cartItem }, "Cart item updated");
+    }
+  ),
+
+  toggleAllCartItems: controllerWrapper(
+    async (req, res, { successResponse }) => {
+      const { id } = req.user;
+      const { checked } = req.body;
+
+      const cart = await cartItemServices.toggleAllCartItems(id, checked);
+
+      return successResponse({ cart }, "Cart updated");
     }
   ),
 
