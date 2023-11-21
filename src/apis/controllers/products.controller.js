@@ -47,14 +47,12 @@ const productsController = {
         category_id,
         p.name,
         p.slug,
-        c.slug AS category_slug,
         p.description,
         p.image,
         p.price,
         p.quantity,
         p.status,
         p.deleted_at,
-        c.name AS category_name,
         pd.author,
         pd.publisher,
         pd.publication_date,
@@ -81,28 +79,47 @@ const productsController = {
     async (req, res, { successResponse, errorResponse, sql }) => {
       const { slug } = req.params;
 
+      const categories = await sql`
+      WITH RECURSIVE CategoryHierarchy AS (
+        SELECT id, parent_id, slug
+        FROM categories
+        WHERE slug = ${slug}
+
+        UNION ALL
+
+        SELECT c.id, c.parent_id, c.slug
+        FROM categories c
+        JOIN CategoryHierarchy ch ON c.parent_id = ch.id
+        )
+        SELECT * FROM CategoryHierarchy;
+      `;
+
+      // const categories = [category.id, category.parentId];
+
       const products = await sql`
-    SELECT
-      p.id,
-      category_id,
-      p.name,
-      p.slug,
-      p.description,
-      p.image,
-      p.price,
-      p.quantity,
-      p.status,
-      p.deleted_at,
-      c.name AS category_name,
-      pd.author
-    FROM
-      products p
-    LEFT JOIN product_details pd ON p.id = pd.id
-    LEFT JOIN categories c ON
-      p.category_id = c.id
-    WHERE
-      p.deleted_at IS NULL AND c.slug = ${slug}
-    ORDER BY p.created_at
+          SELECT
+            p.id,
+            category_id,
+            p.name,
+            p.slug,
+            p.description,
+            p.image,
+            p.price,
+            p.quantity,
+            p.status,
+            p.deleted_at,
+            c.name AS category_name,
+            pd.author
+          FROM
+            products p
+          LEFT JOIN product_details pd ON p.id = pd.id
+          LEFT JOIN categories c ON
+            p.category_id = c.id
+          WHERE
+            p.deleted_at IS NULL AND p.category_id IN ${sql(
+              categories.map((c) => c.id)
+            )}
+          ORDER BY p.created_at
     `;
       return successResponse({ products }, "Products retrieved successfully");
     }
