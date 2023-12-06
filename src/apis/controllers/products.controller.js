@@ -71,7 +71,34 @@ const productsController = {
         return errorResponse("Product not found", 404);
       }
 
-      return successResponse({ product }, "Product retrieved successfully");
+      // get list product in the same category
+      const products = await sql`
+      SELECT
+        p.id,
+        category_id,
+        p.name,
+        p.slug,
+        p.description,
+        p.image,
+        p.price,
+        p.quantity,
+        p.status,
+        c.name AS category_name,
+        c.slug as category_slug,
+        pd.author
+      FROM
+        products p
+      LEFT JOIN product_details pd ON p.id = pd.id
+      LEFT JOIN categories c ON
+        p.category_id = c.id
+      WHERE
+        p.deleted_at IS NULL AND p.category_id = ${product.categoryId} AND p.id != ${product.id}
+      `;
+
+      return successResponse(
+        { product, relateProducts: products },
+        "Product retrieved successfully"
+      );
     }
   ),
 
