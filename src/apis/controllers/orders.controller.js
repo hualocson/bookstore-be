@@ -15,6 +15,25 @@ const ordersController = {
         return errorResponse("Cart is empty", 400);
       }
 
+      // check quantity of product
+      const productIds = cartItems.map((item) => item.productId);
+      const products = await sql`
+        SELECT id, quantity FROM products WHERE id IN ${sql(productIds)}
+      `;
+
+      const productMap = products.reduce((acc, cur) => {
+        acc[cur.id] = cur.quantity;
+        return acc;
+      }, {});
+
+      const invalidItems = cartItems.filter(
+        (item) => item.quantity > productMap[item.productId]
+      );
+
+      if (invalidItems.length) {
+        return errorResponse(`Product is out of stock`, 400);
+      }
+
       const [newOrder, newOrderItems] = await sql.begin(async (sql) => {
         const [newOrder] = await sql`
         INSERT INTO orders ${sql({
@@ -46,6 +65,12 @@ const ordersController = {
           newOrderItems.map((item) => [item.productId, item.quantity])
         )}) AS update_data (productId, quantity)
         WHERE products.id = CAST(update_data.productId AS int)
+        `;
+
+        // update product status if quantity = 0
+        await sql`
+          UPDATE products SET status = 1102
+          WHERE products.quantity = 0 AND products.status != 1102
         `;
 
         // remove cart items
