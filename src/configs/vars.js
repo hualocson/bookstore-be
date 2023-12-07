@@ -1,5 +1,5 @@
-import * as dotenv from "dotenv";
 import osHelpers from "@/lib/helpers.js";
+import * as dotenv from "dotenv";
 import ms from "ms";
 
 dotenv.config();
@@ -52,5 +52,10 @@ export default {
     clientID: osHelpers.getOsEnv("GOOGLE_CLIENT_ID"),
     clientSecret: osHelpers.getOsEnv("GOOGLE_CLIENT_SECRET"),
     callbackURL: osHelpers.getOsEnv("GOOGLE_CALLBACK_URL"),
+  },
+  paypal: {
+    base: "https://api-m.sandbox.paypal.com",
+    clientID: osHelpers.getOsEnv("PAYPAL_CLIENT_ID"),
+    clientSecret: osHelpers.getOsEnv("PAYPAL_CLIENT_SECRET"),
   },
 };
