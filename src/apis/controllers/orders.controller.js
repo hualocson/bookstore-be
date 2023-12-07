@@ -1,5 +1,6 @@
 import { OrderStatus } from "@/lib/constants";
 import controllerWrapper from "@/lib/controller.wrapper";
+import { captureOrder, createPayPalOrder } from "@/lib/utils/paypal";
 import { cartItemServices } from "@/redis-om/cart";
 
 const ordersController = {
@@ -124,6 +125,66 @@ const ordersController = {
       200
     );
   }),
+
+  paypalCreateOrder: controllerWrapper(
+    async (req, res, { successResponse, errorResponse, sql }) => {
+      const { id } = req.user;
+      const { shippingFee } = req.body;
+      const cartItems = await cartItemServices.searchCart(id, {
+        checked: true,
+      });
+
+      if (!cartItems.length) {
+        return errorResponse("Cart is empty", 400);
+      }
+
+      // check quantity of product
+      const productIds = cartItems.map((item) => item.productId);
+      const products = await sql`
+        SELECT id, quantity FROM products WHERE id IN ${sql(productIds)}
+      `;
+
+      const productMap = products.reduce((acc, cur) => {
+        acc[cur.id] = cur.quantity;
+        return acc;
+      }, {});
+
+      const invalidItems = cartItems.filter(
+        (item) => item.quantity > productMap[item.productId]
+      );
+
+      if (invalidItems.length) {
+        return errorResponse(`Product is out of stock`, 400);
+      }
+
+      // count total price
+      const totalPrice =
+        cartItems.reduce((acc, cur) => acc + cur.quantity * cur.price, 0) +
+        parseInt(shippingFee, 10);
+
+      const { jsonResponse, httpStatusCode } =
+        await createPayPalOrder(totalPrice);
+
+      return successResponse(
+        { order: jsonResponse },
+        "Order created",
+        httpStatusCode
+      );
+    }
+  ),
+
+  createPayPalCapture: controllerWrapper(
+    async (req, res, { successResponse, errorResponse, sql }) => {
+      const { orderID } = req.params;
+      const { jsonResponse, httpStatusCode } = await captureOrder(orderID);
+
+      return successResponse(
+        { order: jsonResponse },
+        "Order created",
+        httpStatusCode
+      );
+    }
+  ),
 };
 
 export default ordersController;
