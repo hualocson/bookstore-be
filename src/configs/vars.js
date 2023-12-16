@@ -1,8 +1,7 @@
 import osHelpers from "@/lib/helpers.js";
-import * as dotenv from "dotenv";
+import "dotenv/config";
 import ms from "ms";
 
-dotenv.config();
 // Set the NODE_ENV to 'development' by default
 process.env.NODE_ENV = process.env.NODE_ENV || "development";
 
