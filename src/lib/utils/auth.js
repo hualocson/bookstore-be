@@ -1,9 +1,9 @@
-import crypto from "crypto";
 import sql from "@/configs/db";
 import redisClient from "@/configs/redis";
 import { CustomerStatus } from "@/lib/constants";
-import sendEmail from "./email-sender";
 import { saveUser } from "@/redis-om/user/user.services";
+import crypto from "crypto";
+import sendEmail from "./email-sender";
 
 const handleEmailOnSuccessfulAuth = async (email) => {
   try {
@@ -35,6 +35,9 @@ const handleEmailOnSuccessfulAuth = async (email) => {
 };
 // Generate 6 digit token and save key-value to redis
 async function generateEmailToken(email) {
+  // Redis key in this format `token-${email}`
+  const redisKey = `token--${email}`;
+
   // Randomly generate a number
   const num = crypto.randomBytes(3).readUIntBE(0, 3);
 
@@ -45,9 +48,6 @@ async function generateEmailToken(email) {
   } else {
     token = num.toString().slice(0, 6);
   }
-
-  // Redis key in this format `token-${email}`
-  const redisKey = `token--${email}`;
 
   const expiration = 60 * 60; // 1 hour
 
@@ -66,6 +66,12 @@ const verifyEmailToken = async (email, token) => {
 };
 
 const sendTokenEmail = async (email) => {
+  // Redis key in this format `token-${email}`
+  const redisKey = `token--${email}`;
+  // check token exists
+  const existTokens = await redisClient.get(redisKey);
+
+  if (existTokens) return;
   const token = await generateEmailToken(email);
   await sendEmail(
     email,
@@ -76,8 +82,8 @@ const sendTokenEmail = async (email) => {
 };
 
 export {
-  handleEmailOnSuccessfulAuth,
   generateEmailToken,
+  handleEmailOnSuccessfulAuth,
   sendTokenEmail,
   verifyEmailToken,
 };
