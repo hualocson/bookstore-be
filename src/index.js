@@ -1,8 +1,7 @@
-import http from "http";
 import startApp from "@/app";
 import logger from "@/configs/logger";
-import "dotenv/config";
 import configs from "@/configs/vars";
+import http from "http";
 
 startApp()
   .then((app) => {
